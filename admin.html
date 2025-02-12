@@ -82,7 +82,7 @@
 
     socket.on("userMsgToAdmin", (msg) => {
       removeUserTypingLine();
-      addChatLine("User: " + msg, 'user-line');
+      addChatLine("Niks: " + msg, 'user-line');
     });
 
     socket.on("typing", (isTyping) => {
@@ -104,7 +104,6 @@
       chatLog.scrollTop = chatLog.scrollHeight;
     }
 
-    // Show user is typing
     function showUserTypingLine() {
       if (!userTypingIndicator) {
         addChatLine("User is typing...", 'typing-line');

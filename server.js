@@ -33,10 +33,10 @@ function checkAdminPass(req, res, next) {
   }
 }
 
-app.use(express.static(__dirname));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/', checkUserPass, (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'niks.html'));
 });
 
 app.get('/admin', checkAdminPass, (req, res) => {
@@ -47,12 +47,10 @@ io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
   socket.on('userMessage', (msg) => {
-    console.log('User typed:', msg);
     io.emit('userMsgToAdmin', msg);
   });
 
   socket.on('serverMessage', (msg) => {
-    console.log('Ash typed from admin page:', msg);
     io.emit('serverMessage', msg);
   });
 
@@ -61,7 +59,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('typing', (isTyping) => {
-    console.log(`User is typing: ${isTyping}`);
     socket.broadcast.emit('typing', isTyping);
   });
 });
