@@ -12,20 +12,32 @@ app.use(express.static(__dirname));
 let connectedSockets = [];
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-  connectedSockets.push(socket);
+  console.log('Browser connected:', socket.id);
 
+  // This is from the normal user
   socket.on('userMessage', (msg) => {
-    console.log('Browser user says:', msg);
+    console.log('User typed:', msg);
+    // broadcast or handle as you wish
+    // e.g. socket.broadcast.emit(...) to show other clients
+  });
+
+  // This is from your admin page
+  socket.on('serverMessage', (msg) => {
+    console.log('Ash typed from admin page:', msg);
+    // broadcast to all normal clients: they see "Ash: <msg>"
+    io.emit('serverMessage', msg);
+  });
+
+  socket.on('serverTyping', (isTyping) => {
+    // broadcast to all normal clients
+    io.emit('serverTyping', isTyping);
   });
 
   socket.on('typing', (isTyping) => {
-    console.log(`Browser is ${isTyping ? 'typing...' : 'not typing'}`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-    connectedSockets = connectedSockets.filter(s => s.id !== socket.id);
+    // from the normal user, you can do whatever
+    console.log(`User is typing: ${isTyping}`);
+    // e.g. broadcast to other clients
+    socket.broadcast.emit('typing', isTyping);
   });
 });
 
@@ -62,4 +74,8 @@ process.stdin.on('data', (chunk) => {
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/admin.html');
 });

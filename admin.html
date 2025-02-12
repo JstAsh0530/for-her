@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Ash’s Admin Page</title>
+</head>
+<body>
+  <h1>Ash’s Admin Chat Panel</h1>
+  <input id="adminMsg" type="text" placeholder="Type your message" />
+  <button id="sendBtn">Send</button>
+
+  <!-- Load Socket.io client from your server -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const input = document.getElementById('adminMsg');
+    const btn = document.getElementById('sendBtn');
+
+    let typingTimer = null;
+
+    input.addEventListener('input', () => {
+      socket.emit("serverTyping", true);
+      if (typingTimer) clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        socket.emit("serverTyping", false);
+      }, 1500);
+    });
+
+    btn.addEventListener('click', () => {
+      const msg = input.value.trim();
+      if (msg) {
+        // Stop "typing"
+        socket.emit("serverTyping", false);
+        // Actually send the message
+        socket.emit("serverMessage", msg);
+        input.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
