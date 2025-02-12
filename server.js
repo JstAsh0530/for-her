@@ -2,41 +2,67 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const readline = require('readline');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
 const PORT = process.env.PORT || 3000;
 
+const USER_PASS = process.env.USER_PASS || "user123";
+const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+
+function checkUserPass(req, res, next) {
+  if (req.query.pass === USER_PASS) {
+    next();
+  } else {
+    return res.status(401).send(`
+      <h1>401 - Unauthorized</h1>
+      <p>You must provide the correct <code>?pass=</code> query param to see this page.</p>
+    `);
+  }
+}
+
+function checkAdminPass(req, res, next) {
+  if (req.query.pass === ADMIN_PASS) {
+    next();
+  } else {
+    return res.status(401).send(`
+      <h1>401 - Unauthorized</h1>
+      <p>Use <code>/admin?pass=YOUR_ADMIN_PASS</code> with the correct password.</p>
+    `);
+  }
+}
+
 app.use(express.static(__dirname));
-let connectedSockets = [];
+
+app.get('/', checkUserPass, (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', checkAdminPass, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
 
 io.on('connection', (socket) => {
   console.log('Browser connected:', socket.id);
 
-  // This is from the normal user
   socket.on('userMessage', (msg) => {
     console.log('User typed:', msg);
-    // broadcast or handle as you wish
-    // e.g. socket.broadcast.emit(...) to show other clients
   });
 
-  // This is from your admin page
   socket.on('serverMessage', (msg) => {
     console.log('Ash typed from admin page:', msg);
-    // broadcast to all normal clients: they see "Ash: <msg>"
     io.emit('serverMessage', msg);
   });
 
   socket.on('serverTyping', (isTyping) => {
-    // broadcast to all normal clients
     io.emit('serverTyping', isTyping);
   });
 
   socket.on('typing', (isTyping) => {
-    // from the normal user, you can do whatever
     console.log(`User is typing: ${isTyping}`);
-    // e.g. broadcast to other clients
     socket.broadcast.emit('typing', isTyping);
   });
 });
@@ -45,37 +71,13 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-
-let isTyping = false;
-let typingTimeout = null;
 rl.on('line', (input) => {
-  isTyping = false;
-  io.emit('serverTyping', false);
   const msg = input.trim();
   if (msg) {
-    io.emit('serverMessage', msg); 
-  }
-});
-
-process.stdin.on('data', (chunk) => {
-  const str = chunk.toString();
-  if (!str.includes('\n')) {
-    if (!isTyping) {
-      isTyping = true;
-      io.emit('serverTyping', true);
-    }
-    if (typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
-      isTyping = false;
-      io.emit('serverTyping', false);
-    }, 2000);
+    io.emit('serverMessage', msg);
   }
 });
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
-
-app.get('/admin', (req, res) => {
-  res.sendFile(__dirname + '/admin.html');
 });
