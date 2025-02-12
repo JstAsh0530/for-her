@@ -33,7 +33,7 @@ function checkAdminPass(req, res, next) {
   }
 }
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(express.static(__dirname));
 
 app.get('/', checkUserPass, (req, res) => {
   res.sendFile(path.join(__dirname, 'niks.html'));
