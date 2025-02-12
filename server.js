@@ -1,7 +1,6 @@
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
-const readline = require('readline');
 const path = require('path');
 
 const app = express();
@@ -10,8 +9,8 @@ const io = socketIO(server);
 
 const PORT = process.env.PORT || 3000;
 
-const USER_PASS = process.env.USER_PASS || "user123";
-const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
+const USER_PASS = process.env.USER_PASS;
+const ADMIN_PASS = process.env.ADMIN_PASS;
 
 function checkUserPass(req, res, next) {
   if (req.query.pass === USER_PASS) {
@@ -19,18 +18,17 @@ function checkUserPass(req, res, next) {
   } else {
     return res.status(401).send(`
       <h1>401 - Unauthorized</h1>
-      <p>You must provide the correct <code>?pass=</code> query param to see this page.</p>
+      <p>You must go to /?pass=USER_PASS</p>
     `);
   }
 }
-
 function checkAdminPass(req, res, next) {
   if (req.query.pass === ADMIN_PASS) {
     next();
   } else {
     return res.status(401).send(`
       <h1>401 - Unauthorized</h1>
-      <p>Use <code>/admin?pass=YOUR_ADMIN_PASS</code> with the correct password.</p>
+      <p>Use /admin?pass=ADMIN_PASS</p>
     `);
   }
 }
@@ -50,6 +48,7 @@ io.on('connection', (socket) => {
 
   socket.on('userMessage', (msg) => {
     console.log('User typed:', msg);
+    io.emit('userMsgToAdmin', msg);
   });
 
   socket.on('serverMessage', (msg) => {
@@ -65,17 +64,6 @@ io.on('connection', (socket) => {
     console.log(`User is typing: ${isTyping}`);
     socket.broadcast.emit('typing', isTyping);
   });
-});
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-rl.on('line', (input) => {
-  const msg = input.trim();
-  if (msg) {
-    io.emit('serverMessage', msg);
-  }
 });
 
 server.listen(PORT, () => {
