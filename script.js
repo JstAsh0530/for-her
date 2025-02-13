@@ -31,11 +31,11 @@ const originalContent = [
   "a place where it's just us, forever.",
   "",
   "oh btw, hope you would like to also play CODM with me.",
-  "yk, if just in case your ‘phone’ happen to support it somehow :pp",
+  "yk, if just in case your ‘phone’ happens to support it somehow :pp",
   "",
   "That's all I wanted to say, but my last question,",
   "andd... be honest.",
-  "will you be my valentine?"
+  "<span class=\"glitch\">Will you be my Valentine? ❤️</span>"
 ];
 
 class TypeWriter {
@@ -205,39 +205,6 @@ class TypeWriter {
   }
 }
 
-const konamiSequence = [
-  "ArrowUp", "ArrowUp",
-  "ArrowDown", "ArrowDown",
-  "ArrowLeft", "ArrowRight",
-  "ArrowLeft", "ArrowRight",
-  "b", "a"
-];
-let sequencePosition = 0;
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === konamiSequence[sequencePosition]) {
-    sequencePosition++;
-    if (sequencePosition === konamiSequence.length) {
-      document.body.classList.toggle("secret-mode");
-      sequencePosition = 0;
-    }
-  } else {
-    sequencePosition = 0;
-  }
-});
-
-let touchStartY = 0;
-document.addEventListener("touchstart", (e) => {
-  touchStartY = e.touches[0].clientY;
-});
-
-document.addEventListener("touchmove", (e) => {
-  const deltaY = e.touches[0].clientY - touchStartY;
-  if (Math.abs(deltaY) > 100) {
-    document.body.classList.add("secret-mode");
-  }
-});
-
 function setupSocketListeners(writerInstance) {
   socket.on("serverTyping", (isTyping) => {
     if (isTyping) {
@@ -274,11 +241,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let savedState = null;
     const stored = localStorage.getItem("terminalState");
     if (stored) {
-      try { savedState = JSON.parse(stored); } catch(e) {}
+      try { 
+        savedState = JSON.parse(stored); 
+      } catch(e) {}
     }
 
-    const writer = new TypeWriter(originalContent, document.getElementById("terminal-content"), savedState);
+    const writer = new TypeWriter(
+      originalContent,
+      document.getElementById("terminal-content"),
+      savedState
+    );
     writer.start();
+
     socket = io();
     setupSocketListeners(writer);
   }, 3000);
