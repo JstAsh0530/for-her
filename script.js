@@ -169,8 +169,11 @@ class TypeWriter {
     this.inputElement = document.createElement("input");
     this.inputElement.type = "text";
     this.inputElement.className = "terminal-input";
-    this.inputElement.placeholder = "Type your response and press Enter...";
-
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      this.inputElement.placeholder = "Tap to type your response...";
+    } else {
+      this.inputElement.placeholder = "Type your response and press Enter...";
+    }
     this.element.appendChild(this.inputElement);
     this.inputElement.focus();
 

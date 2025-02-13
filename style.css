@@ -5,7 +5,7 @@
 
 :root {
   --main-color: #ff69f5;
-  --bg-color: #1a000d;
+  --bg-color: #2B0015;
 }
 
 body {
@@ -15,7 +15,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center; 
-  min-height: 100vh;
+  min-height: 100vh; 
   font-family: 'VT323', monospace;
   color: var(--main-color);
   position: relative;
@@ -25,22 +25,18 @@ body {
 
 body::before {
   content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, #330016 0%, #1a000d 70%, #000 100%);
+  position: fixed; 
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at center, #330016 0%, #2B0015 70%, #000 100%);
   z-index: -2;
 }
 
 body::after {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
+  top: 0; left: 0;
+  width: 200%; height: 200%;
   pointer-events: none;
   background-image: url('assets/heart.png');
   background-repeat: repeat;
@@ -51,12 +47,8 @@ body::after {
 }
 
 @keyframes float-hearts {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(-20%, -20%);
-  }
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-20%, -20%); }
 }
 
 .terminal {
@@ -83,19 +75,18 @@ body::after {
 .screen {
   position: relative;
   width: 100%;
-  height: 600px;
+  height: 600px; 
   padding: 30px 35px 60px 35px; 
   overflow-y: auto; 
   clip-path: inset(2% 3% 5% 3% round 2px);
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: repeating-linear-gradient(
     0deg,
     rgba(0, 0, 0, 0.15) 0px,
@@ -115,7 +106,6 @@ body::after {
     0 0 20px rgba(255, 105, 245, 0.5),
     0 0 30px rgba(255, 105, 245, 0.3);
   letter-spacing: 0.5px;
-  text-rendering: optimizeLegibility;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -138,21 +128,17 @@ body::after {
   color: #ff0000;
   text-decoration: line-through;
 }
-
-
 .server-typing-line {
   font-size: 1rem;
   color: #aaaaaa;
   font-style: italic;
-  opacity: 0.8;  
+  opacity: 0.8;
 }
 
 .vintage-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed; 
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: repeating-linear-gradient(
     0deg,
     rgba(0, 0, 0, 0.15) 0px,
@@ -167,17 +153,14 @@ body::after {
 
 .boot-screen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background-color: var(--bg-color);
   z-index: 100;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
 .progress-bar {
   width: 0%;
   height: 4px;
@@ -192,47 +175,54 @@ body::after {
   15%  { opacity: 0.85; }
   100% { opacity: 0.9; }
 }
-
 @keyframes load {
   0%   { width: 0%; }
   100% { width: 100%; }
 }
-
 @keyframes matrix-flicker {
   0%   { filter: hue-rotate(120deg) brightness(1.2); }
   50%  { filter: hue-rotate(120deg) brightness(0.9); }
-}
-
-@media (max-width: 768px) {
-  .terminal {
-    width: 95%;
-    transform: perspective(200px) rotateX(3deg);
-    margin: 20px auto;
-  }
-  .screen {
-    height: 500px; 
-    padding: 20px 25px;
-  }
-}
-
-@media (max-width: 480px) {
-  .terminal {
-    transform: none; 
-    width: 95%;
-    margin: 15px auto;
-  }
-  .screen {
-    height: 70vh; 
-    padding: 20px;
-  }
-  .content {
-    font-size: 1.2rem;
-    line-height: 1.5;
-  }
 }
 
 .secret-mode .terminal {
   --main-color: #00ff00;
   filter: hue-rotate(120deg);
   animation: matrix-flicker 0.1s infinite;
+}
+
+@media (max-width: 768px) {
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; 
+  }
+
+  .terminal {
+    transform: none; 
+    margin: 0 auto; 
+    width: 90%;
+    height: 90%;
+    max-width: 450px;
+    max-height: 90%;   
+    box-sizing: border-box; 
+    display: flex;
+    flex-direction: column;
+  }
+  .terminal-input {
+    width: 100%;
+  }
+  .screen {
+    flex: 1;
+    width: 100%;
+    height: auto;
+    overflow-y: auto;
+    padding: 10px 15px 40px;
+    box-sizing: border-box;
+  }
+  .content {
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
 }
